@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 
 		clean: {
 			dev: {
-				src: ['dev']
+				src: ['build-dev']
 			}
 		},
 
@@ -19,27 +19,8 @@ module.exports = function(grunt) {
 	                lineNumbers: true
 				},
 				files: {
-					'dev/css/compiled.css': 'app/sass/compiled.scss'
+					'build-dev/css/compiled.css': 'app/sass/compiled.scss'
 				}
-			}
-		},
-
-
-		copy: {
-			dev: {
-				files: [
-					{
-						expand: true,
-						cwd: 'app/',
-						src: [
-							'index.html',
-							'js/libs/modernizr.min.js',
-							'img/**/*',
-							'data/**/*'
-						],
-						dest: 'dev/'
-					}
-				]
 			}
 		},
 
@@ -54,11 +35,14 @@ module.exports = function(grunt) {
 					compress: false
 				},
 				files:{
-					'dev/js/libs.min.js': [ 
+					'build-dev/js/libs.min.js': [ 
 						'app/js/libs/**/*.js',
 						'!app/js/libs/modernizr.min.js'
 					],
-					'dev/js/gymbox.min.js': [ 
+					'build-dev/js/modernizr.min.js': [
+						'app/js/libs/modernizr.min.js'
+					],
+					'build-dev/js/project-name.min.js': [ 
 						'app/js/**/*.js',
 						'!app/js/libs/**/*.js'
 					]
@@ -67,8 +51,26 @@ module.exports = function(grunt) {
 		},
 
 
+		copy: {
+			dev: {
+				files: [
+					{
+						expand: true,
+						cwd: 'app/',
+						src: [
+							'index.html',
+							'img/**/*',
+							'data/**/*'
+						],
+						dest: 'build-dev/'
+					}
+				]
+			}
+		},
+
+
 		connect: {
-			server:{
+			devServer:{
 				options: {
 					hostname: '*',
 					port: 9009,
@@ -120,8 +122,16 @@ module.exports = function(grunt) {
 								]);
 
 	grunt.registerTask('server', [ 
-									'setup', 
-									'connect:server', 
+									'clean:dev', 
+									'sass:dev', 
+									'uglify:dev',
+									'copy:dev',
+									'connect:devServer', 
 									'watch'
 								]);
 };
+
+
+
+
+
