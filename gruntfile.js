@@ -76,7 +76,7 @@ module.exports = function(grunt) {
 					banner: '<%= banner %>',
 					mangle: true,
 					beautify : false,
-					preserveComments: "all",
+					preserveComments: false,
 					compress: false
 				},
 				files:{
@@ -101,39 +101,31 @@ module.exports = function(grunt) {
 
 
 		copy: {
-			img: {
+			dev: {
 				files: [
 					{
 						expand: true,
 						cwd: 'app/',
 						src: [
-							'img/**/*'
-						],
-						dest: ENVIRONMENT
-					}
-				]
-			},
-			data: {
-				files: [
-					{
-						expand: true,
-						cwd: 'app/',
-						src: [
-							'data/**/*'
-						],
-						dest: ENVIRONMENT
-					}
-				]
-			},
-			html: {
-				files: [
-					{
-						expand: true,
-						cwd: 'app/',
-						src: [
+							'img/**/*',
+							'data/**/*',
 							'index.html'
 						],
-						dest: ENVIRONMENT
+						dest: '<%= settings.paths.dev_base %>'
+					}
+				]
+			},
+			prod: {
+				files: [
+					{
+						expand: true,
+						cwd: 'app/',
+						src: [
+							'img/**/*',
+							'data/**/*',
+							'index.html'
+						],
+						dest: '<%= settings.paths.prod_base %>'
 					}
 				]
 			}
@@ -176,13 +168,13 @@ module.exports = function(grunt) {
 				files: [
 					'<%= settings.paths.app_img %>**',
 				],
-				tasks: ['copy:img']
+				tasks: ['copy:'+ENVIRONMENT]
 			},
 			data: {
 				files: [
 					'<%= settings.paths.app_data %>**',
 				],
-				tasks: ['copy:data']
+				tasks: ['copy:'+ENVIRONMENT]
 			},
 			js: {
 				files: [
@@ -194,7 +186,7 @@ module.exports = function(grunt) {
 				files: [
 					'<%= settings.paths.app_source %>index.html'
 				],
-				tasks: ['copy:html']
+				tasks: ['copy:'+ENVIRONMENT]
 			}
 		},
 
@@ -218,7 +210,7 @@ module.exports = function(grunt) {
 			'clean:all', 
 			'sass:prod', 
 			'uglify:prod', 
-			'copy'
+			'copy:prod'
 
 	]);
 
@@ -232,8 +224,8 @@ module.exports = function(grunt) {
 			'clean:all', 
 			'sass:'+	ENVIRONMENT, 
 			'uglify:'+	ENVIRONMENT, 
-			'copy',
-			'connect:'+  ENVIRONMENT, 
+			'copy:'+	ENVIRONMENT, 
+			'connect:'+ ENVIRONMENT, 
 			'watch'
 
 		]);
