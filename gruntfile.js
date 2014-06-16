@@ -1,13 +1,22 @@
 module.exports = function(grunt) {
 
+	var ENVIRONMENT = 'dev';
+
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
+		settings: grunt.file.readJSON('grunt/settings.json'),
 
 
 		clean: {
-			dev: {
-				src: ['build-dev']
+
+			all: {
+				src: [
+					'<%= settings.paths.dev_base %>',
+					'<%= settings.paths.prod_base %>'
+				]
 			}
+
+
 		},
 
 
@@ -15,17 +24,27 @@ module.exports = function(grunt) {
 			dev: {
 				options: {
 					noCache: true,
-	                quiet: true,
 	                lineNumbers: true
 				},
 				files: {
-					'build-dev/css/compiled.css': 'app/sass/compiled.scss'
+					'<%= settings.paths.dev_base %>css/compiled.css': '<%= settings.paths.app_sass %>compiled.scss'
+				}
+			},
+			prod: {
+				options: {
+					noCache: true,
+	                quiet: true,
+	                lineNumbers: false
+				},
+				files: {
+					'<%= settings.paths.prod_base %>css/compiled.css': '<%= settings.paths.app_sass %>compiled.scss'
 				}
 			}
 		},
 
 
 		uglify:{
+
 			dev:{
 				options: {
 					banner: '<%= banner %>',
@@ -35,34 +54,86 @@ module.exports = function(grunt) {
 					compress: false
 				},
 				files:{
-					'build-dev/js/libs.min.js': [ 
-						'app/js/libs/**/*.js',
-						'!app/js/libs/modernizr.min.js'
+					// Libs
+					'<%= settings.paths.dev_base %>js/libs.min.js': [ 
+						'<%= settings.paths.app_js %>libs/**/*.js',
+						'!<%= settings.paths.app_js %>libs/modernizr.min.js'
 					],
-					'build-dev/js/modernizr.min.js': [
-						'app/js/libs/modernizr.min.js'
+					// Modernizr
+					'<%= settings.paths.dev_base %>js/modernizr.min.js': [
+						'<%= settings.paths.app_js %>libs/modernizr.min.js'
 					],
-					'build-dev/js/project-name.min.js': [ 
-						'app/js/**/*.js',
-						'!app/js/libs/**/*.js'
+					// Main JS
+					'<%= settings.paths.dev_base %>js/project-name.min.js': [ 
+						'<%= settings.paths.app_js %>**/*.js',
+						'!<%= settings.paths.app_js %>libs/**/*.js'
+					]
+				}
+			},
+
+			prod:{
+				options: {
+					banner: '<%= banner %>',
+					mangle: true,
+					beautify : false,
+					preserveComments: "all",
+					compress: false
+				},
+				files:{
+					// Libs
+					'<%= settings.paths.prod_base %>js/libs.min.js': [ 
+						'<%= settings.paths.app_js %>libs/**/*.js',
+						'!<%= settings.paths.app_js %>libs/modernizr.min.js'
+					],
+					// Modernizr
+					'<%= settings.paths.prod_base %>js/modernizr.min.js': [
+						'<%= settings.paths.app_js %>libs/modernizr.min.js'
+					],
+					// Main JS
+					'<%= settings.paths.prod_base %>js/project-name.min.js': [ 
+						'<%= settings.paths.app_js %>**/*.js',
+						'!<%= settings.paths.app_js %>libs/**/*.js'
 					]
 				}
 			}
+
 		},
 
 
 		copy: {
-			dev: {
+			img: {
 				files: [
 					{
 						expand: true,
 						cwd: 'app/',
 						src: [
-							'index.html',
-							'img/**/*',
+							'img/**/*'
+						],
+						dest: ENVIRONMENT
+					}
+				]
+			},
+			data: {
+				files: [
+					{
+						expand: true,
+						cwd: 'app/',
+						src: [
 							'data/**/*'
 						],
-						dest: 'build-dev/'
+						dest: ENVIRONMENT
+					}
+				]
+			},
+			html: {
+				files: [
+					{
+						expand: true,
+						cwd: 'app/',
+						src: [
+							'index.html'
+						],
+						dest: ENVIRONMENT
 					}
 				]
 			}
@@ -70,14 +141,24 @@ module.exports = function(grunt) {
 
 
 		connect: {
-			devServer:{
+			
+			dev:{
 				options: {
 					hostname: '*',
-					port: 9009,
+					port: 3333,
 					// keepalive: true,
-					base: 'dev'
+					base: '<%= settings.paths.dev_base %>'
+				}
+			},
+			prod:{
+				options: {
+					hostname: '*',
+					port: 4444,
+					// keepalive: true,
+					base: '<%= settings.paths.prod_base %>'
 				}
 			}
+
 		},
 
 
@@ -87,21 +168,33 @@ module.exports = function(grunt) {
 			},
 			sass: {
 				files: [
-					'app/sass/**/*.scss'
+					'<%= settings.paths.app_sass %>**/*.scss'
 				],
-				tasks: ['sass']
+				tasks: ['sass:'+ENVIRONMENT]
 			},
 			images: {
 				files: [
-					'app/img/**'
+					'<%= settings.paths.app_img %>**',
 				],
-				tasks: ['copy:dev']
+				tasks: ['copy:img']
+			},
+			data: {
+				files: [
+					'<%= settings.paths.app_data %>**',
+				],
+				tasks: ['copy:data']
 			},
 			js: {
 				files: [
-					'app/js/**/*.js'
+					'<%= settings.paths.app_js %>**/*.js'
 				],
-				tasks: ['uglify:dev']
+				tasks: ['uglify:'+ENVIRONMENT]
+			}, 
+			html: {				
+				files: [
+					'<%= settings.paths.app_source %>index.html'
+				],
+				tasks: ['copy:html']
 			}
 		},
 
@@ -114,21 +207,39 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-connect'); 
 	grunt.loadNpmTasks('grunt-contrib-watch'); 
 
-	grunt.registerTask('setup',  [
-									'clean', 
-									'sass', 
-									'uglify',
-									'copy'
-								]);
+	// Target is either prod or dev.
+	// 
+	// grunt server:dev
+	// or
+	// grunt server:prod
 
-	grunt.registerTask('server', [ 
-									'clean:dev', 
-									'sass:dev', 
-									'uglify:dev',
-									'copy:dev',
-									'connect:devServer', 
-									'watch'
-								]);
+	grunt.registerTask('deploy', [
+
+			'clean:all', 
+			'sass:prod', 
+			'uglify:prod', 
+			'copy'
+
+	]);
+
+
+	grunt.registerTask('server', function(env){
+
+		ENVIRONMENT = env ? env : 'prod';
+
+		grunt.task.run([
+
+			'clean:all', 
+			'sass:'+	ENVIRONMENT, 
+			'uglify:'+	ENVIRONMENT, 
+			'copy',
+			'connect:'+  ENVIRONMENT, 
+			'watch'
+
+		]);
+
+	});
+
 };
 
 

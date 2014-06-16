@@ -1,0 +1,19 @@
+{
+
+	"paths":{
+
+		"app_source":      "app/",
+		"app_fonts":       "app/fonts/",
+		"app_js":          "app/js/",
+		"app_img":         "app/img/",
+		"app_data":        "app/data/",
+		"app_sass":        "app/sass/",
+
+		"dev_base":        "dev/",
+		"dev_fonts":       "deploy/fonts/",
+
+		"prod_base":     "prod/",
+		"prod_fonts":    "prod/fonts/"
+	}
+
+}
