@@ -42,6 +42,37 @@ module.exports = function(grunt) {
 			}
 		},
 
+		complexity: {
+			dev: {
+				src: [ '<%= settings.paths.dev_base %>js/project-name.min.js' ],
+				options: {
+					breakOnErrors: true,
+					jsLintXML: 'report.xml',         // create XML JSLint-like report
+					checkstyleXML: 'checkstyle.xml', // create checkstyle report
+					errorsOnly: false,               // show only maintainability errors
+					cyclomatic: [3, 7, 12],          // or optionally a single value, like 3
+					halstead: [8, 13, 20],           // or optionally a single value, like 8
+					maintainability: 100,
+					hideComplexFunctions: false,     // only display maintainability
+					broadcast: false                 // broadcast data over event-bus
+				}
+			},
+			prod: {
+				src: [ '<%= settings.paths.prod_base %>js/project-name.min.js' ],
+				options: {
+					breakOnErrors: true,
+					jsLintXML: 'report.xml',         // create XML JSLint-like report
+					checkstyleXML: 'checkstyle.xml', // create checkstyle report
+					errorsOnly: false,               // show only maintainability errors
+					cyclomatic: [3, 7, 12],          // or optionally a single value, like 3
+					halstead: [8, 13, 20],           // or optionally a single value, like 8
+					maintainability: 100,
+					hideComplexFunctions: false,     // only display maintainability
+					broadcast: false                 // broadcast data over event-bus
+				}
+			}
+		},
+
 
 		uglify:{
 
@@ -194,6 +225,7 @@ module.exports = function(grunt) {
 	
 	grunt.loadNpmTasks('grunt-contrib-clean'); 
 	grunt.loadNpmTasks('grunt-contrib-sass'); 
+	grunt.loadNpmTasks('grunt-complexity'); 
 	grunt.loadNpmTasks('grunt-contrib-copy'); 
 	grunt.loadNpmTasks('grunt-contrib-uglify'); 
 	grunt.loadNpmTasks('grunt-contrib-connect'); 
@@ -222,10 +254,11 @@ module.exports = function(grunt) {
 		grunt.task.run([
 
 			'clean:all', 
-			'sass:'+	ENVIRONMENT, 
-			'uglify:'+	ENVIRONMENT, 
-			'copy:'+	ENVIRONMENT, 
-			'connect:'+ ENVIRONMENT, 
+			'sass:'+		ENVIRONMENT, 
+			'uglify:'+		ENVIRONMENT, 
+			'copy:'+		ENVIRONMENT, 
+			'complexity:'+	ENVIRONMENT, 
+			'connect:'+ 	ENVIRONMENT, 
 			'watch'
 
 		]);
