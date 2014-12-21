@@ -249,7 +249,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('server', function(env){
 
-		ENVIRONMENT = env ? env : 'prod';
+		ENVIRONMENT = env ? env : 'dev';
 
 		grunt.task.run([
 

@@ -9,11 +9,12 @@
 		"app_data":        "app/data/",
 		"app_sass":        "app/sass/",
 
-		"dev_base":        "dev/",
-		"dev_fonts":       "deploy/fonts/",
+		"dev_base":        "builds/dev/",
+		"dev_fonts":       "builds/dev/fonts/",
 
-		"prod_base":     "prod/",
-		"prod_fonts":    "prod/fonts/"
+		"prod_base":       "builds/prod/",
+		"prod_fonts":      "builds/prod/fonts/"
+	
 	}
 
 }

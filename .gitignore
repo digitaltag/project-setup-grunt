@@ -1,3 +1,4 @@
+checkstyle.xml
+report.xml
 node_modules/
-/dev/
-/prod/
+builds/
